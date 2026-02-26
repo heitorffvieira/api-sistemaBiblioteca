@@ -4,7 +4,6 @@ import br.com.vieiradev.apiBiblioteca.dtos.ClientRequestDTO;
 import br.com.vieiradev.apiBiblioteca.dtos.ClientResponseDTO;
 import br.com.vieiradev.apiBiblioteca.services.ClientService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,8 +15,11 @@ import java.util.List;
 @RequestMapping("/clients")
 public class ClientController {
 
-    @Autowired
-    private ClientService clientService;
+    private final ClientService clientService;
+
+    public ClientController(ClientService clientService) {
+        this.clientService = clientService;
+    }
 
     @PostMapping
     public ResponseEntity<ClientResponseDTO> create(@Valid @RequestBody ClientRequestDTO dto) {
@@ -35,25 +37,21 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<List<ClientResponseDTO>> getAll() {
-        return ResponseEntity.ok(clientService.findAll());
+        return ResponseEntity.ok(clientService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.findById(id));
+        return ResponseEntity.ok(clientService.getById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> update(
-            @PathVariable Long id,
-            @Valid @RequestBody ClientRequestDTO dto) {
-
+    public ResponseEntity<ClientResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ClientRequestDTO dto) {
         return ResponseEntity.ok(clientService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-
         clientService.delete(id);
         return ResponseEntity.noContent().build();
     }

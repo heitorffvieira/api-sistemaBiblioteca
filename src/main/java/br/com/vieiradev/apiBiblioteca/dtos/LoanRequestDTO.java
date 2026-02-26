@@ -1,11 +1,13 @@
 package br.com.vieiradev.apiBiblioteca.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-@Setter
-public class LoanRequestDTO {
-    private Long bookId;
-    private Long clientId;
-}
+public record LoanRequestDTO(
+
+        @NotNull(message = "BookId é obrigatório.")
+        Long bookId,
+
+        @NotNull(message = "ClientId é obrigatório.")
+        Long clientId
+
+) {}

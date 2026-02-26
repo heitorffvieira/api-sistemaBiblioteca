@@ -19,11 +19,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ClientService {
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
+    private final LoanRepository loanRepository;
 
-    @Autowired
-    private LoanRepository loanRepository;
+    public ClientService(ClientRepository clientRepository, LoanRepository loanRepository) {
+        this.clientRepository = clientRepository;
+        this.loanRepository = loanRepository;
+    }
 
     public ClientResponseDTO save(ClientRequestDTO dto) {
 
@@ -42,14 +44,14 @@ public class ClientService {
         return toResponseDTO(saved);
     }
 
-    public List<ClientResponseDTO> findAll() {
+    public List<ClientResponseDTO> getAll() {
         return clientRepository.findAll()
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
-    public ClientResponseDTO findById(Long id) {
+    public ClientResponseDTO getById(Long id) {
         Client client = findClientOrThrow(id);
         return toResponseDTO(client);
     }

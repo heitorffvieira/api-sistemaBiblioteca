@@ -1,15 +1,12 @@
 package br.com.vieiradev.apiBiblioteca.services;
 
+import br.com.vieiradev.apiBiblioteca.dtos.LoanResponseDTO;
 import br.com.vieiradev.apiBiblioteca.exceptions.BusinessException;
 import br.com.vieiradev.apiBiblioteca.exceptions.ResourceNotFoundException;
-import br.com.vieiradev.apiBiblioteca.models.Book;
-import br.com.vieiradev.apiBiblioteca.models.Client;
-import br.com.vieiradev.apiBiblioteca.models.Loan;
-import br.com.vieiradev.apiBiblioteca.models.LoanStatus;
+import br.com.vieiradev.apiBiblioteca.models.*;
 import br.com.vieiradev.apiBiblioteca.repositories.BookRepository;
 import br.com.vieiradev.apiBiblioteca.repositories.ClientRepository;
 import br.com.vieiradev.apiBiblioteca.repositories.LoanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,29 +14,38 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LoanService {
 
-    @Autowired
-    private LoanRepository loanRepository;
+    private final LoanRepository loanRepository;
+    private final BookRepository bookRepository;
+    private final ClientRepository clientRepository;
 
-    @Autowired
-    private BookRepository bookRepository;
+    public LoanService(LoanRepository loanRepository,
+                       BookRepository bookRepository,
+                       ClientRepository clientRepository) {
 
-    @Autowired
-    private ClientRepository clientRepository;
-
-    public List<Loan> getAll() {
-        return loanRepository.findAll();
+        this.loanRepository = loanRepository;
+        this.bookRepository = bookRepository;
+        this.clientRepository = clientRepository;
     }
 
-    public Loan getById(Long id) {
-        return findLoanOrThrow(id);
+    public List<LoanResponseDTO> getAll() {
+        return loanRepository.findAll()
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Loan createLoan(Long bookId, Long clientId) {
+    public LoanResponseDTO getById(Long id) {
+        Loan loan = findLoanOrThrow(id);
+        return toResponseDTO(loan);
+    }
+
+    public LoanResponseDTO createLoan(Long bookId, Long clientId) {
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado."));
@@ -47,41 +53,33 @@ public class LoanService {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado."));
 
-        if (loanRepository.existsByClientIdAndBookIdAndStatus(clientId, bookId, LoanStatus.EM_ANDAMENTO)) {
+        if (loanRepository.existsByClientIdAndBookIdAndStatus(
+                clientId, bookId, LoanStatus.EM_ANDAMENTO)) {
             throw new BusinessException("Cliente já possui este livro emprestado.");
         }
 
-        if (book.getAvailableQuantity() <= 0) {
-            throw new BusinessException("Livro sem estoque.");
-        }
+        book.borrow();
 
         LocalDate today = LocalDate.now();
 
-        Loan loan = new Loan();
-        loan.setBook(book);
-        loan.setClient(client);
-        loan.setLoanDate(today);
-        loan.setReturnDate(today.plusDays(7));
-        loan.setStatus(LoanStatus.EM_ANDAMENTO);
-        loan.setFineValue(BigDecimal.ZERO);
+        Loan loan = new Loan(
+                book,
+                client,
+                today,
+                today.plusDays(7)
+        );
 
-        book.setAvailableQuantity(book.getAvailableQuantity() - 1);
+        loanRepository.save(loan);
 
-        return loanRepository.save(loan);
+        return toResponseDTO(loan);
     }
 
-    public Loan returnLoan(Long id) {
+    public LoanResponseDTO returnLoan(Long id) {
 
         Loan loan = findLoanOrThrow(id);
 
-        if (loan.getStatus() != LoanStatus.EM_ANDAMENTO) {
-            throw new BusinessException("Esse empréstimo já foi finalizado.");
-        }
-
         LocalDate today = LocalDate.now();
-        LocalDate expectedReturnDate = loan.getReturnDate();
-
-        long daysLate = ChronoUnit.DAYS.between(expectedReturnDate, today);
+        long daysLate = ChronoUnit.DAYS.between(loan.getReturnDate(), today);
 
         BigDecimal fine = BigDecimal.ZERO;
 
@@ -90,13 +88,10 @@ public class LoanService {
             fine = finePerDay.multiply(BigDecimal.valueOf(daysLate));
         }
 
-        loan.setStatus(LoanStatus.DEVOLVIDO);
-        loan.setFineValue(fine);
+        loan.finalizeLoan(fine);
+        loan.getBook().returnBook();
 
-        Book book = loan.getBook();
-        book.setAvailableQuantity(book.getAvailableQuantity() + 1);
-
-        return loanRepository.save(loan);
+        return toResponseDTO(loan);
     }
 
     public void delete(Long id) {
@@ -104,7 +99,9 @@ public class LoanService {
         Loan loan = findLoanOrThrow(id);
 
         if (loan.getStatus() == LoanStatus.EM_ANDAMENTO) {
-            throw new BusinessException("Não é possível excluir um empréstimo em andamento.");
+            throw new BusinessException(
+                    "Não é possível excluir um empréstimo em andamento."
+            );
         }
 
         loanRepository.delete(loan);
@@ -113,5 +110,19 @@ public class LoanService {
     private Loan findLoanOrThrow(Long id) {
         return loanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado."));
+    }
+
+    private LoanResponseDTO toResponseDTO(Loan loan) {
+        return new LoanResponseDTO(
+                loan.getId(),
+                loan.getBook().getId(),
+                loan.getBook().getTitle(),
+                loan.getClient().getId(),
+                loan.getClient().getName(),
+                loan.getLoanDate(),
+                loan.getReturnDate(),
+                loan.getStatus(),
+                loan.getFineValue()
+        );
     }
 }
