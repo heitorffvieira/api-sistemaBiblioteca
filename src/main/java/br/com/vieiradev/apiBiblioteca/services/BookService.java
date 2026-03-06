@@ -93,6 +93,27 @@ public class BookService {
         bookRepository.delete(book);
     }
 
+    public List<BookResponseDTO> searchBooks(String title) {
+
+        if (title == null || title.isBlank()) {
+            return List.of();
+        }
+
+        List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
+
+        return books.stream()
+                .map(book -> new BookResponseDTO(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor(),
+                        book.getIsbn(),
+                        book.getPublicationYear(),
+                        book.getTotalQuantity(),
+                        book.getAvailableQuantity()
+                ))
+                .toList();
+    }
+
     private BookResponseDTO toResponseDTO(Book book) {
         return new BookResponseDTO(
                 book.getId(),

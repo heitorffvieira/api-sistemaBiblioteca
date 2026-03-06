@@ -45,6 +45,14 @@ public class ClientController {
         return ResponseEntity.ok(clientService.getById(id));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ClientResponseDTO>> searchClients(@RequestParam String name) {
+
+        List<ClientResponseDTO> clients = clientService.searchClients(name);
+
+        return ResponseEntity.ok(clients);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ClientRequestDTO dto) {
         return ResponseEntity.ok(clientService.update(id, dto));

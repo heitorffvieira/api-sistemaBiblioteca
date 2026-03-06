@@ -8,7 +8,6 @@ import br.com.vieiradev.apiBiblioteca.models.Client;
 import br.com.vieiradev.apiBiblioteca.models.LoanStatus;
 import br.com.vieiradev.apiBiblioteca.repositories.ClientRepository;
 import br.com.vieiradev.apiBiblioteca.repositories.LoanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,6 +87,24 @@ public class ClientService {
         }
 
         clientRepository.delete(client);
+    }
+
+    public List<ClientResponseDTO> searchClients(String name) {
+
+        if (name == null || name.isBlank()) {
+            return List.of();
+        }
+
+        List<Client> clients = clientRepository.findByNameContainingIgnoreCase(name);
+
+        return clients.stream()
+                .map(client -> new ClientResponseDTO(
+                        client.getId(),
+                        client.getName(),
+                        client.getEmail(),
+                        client.getCpf()
+                ))
+                .toList();
     }
 
     private Client findClientOrThrow(Long id) {
