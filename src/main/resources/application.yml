@@ -1,15 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/biblioteca-digital
-    username: postgres
-    password: vieiradev
+    url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     open-in-view: false
 
 server:
-  port: 8080
+  port: ${PORT:8080}

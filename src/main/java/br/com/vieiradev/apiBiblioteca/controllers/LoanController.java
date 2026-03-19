@@ -1,6 +1,5 @@
 package br.com.vieiradev.apiBiblioteca.controllers;
 
-import br.com.vieiradev.apiBiblioteca.dtos.ClientResponseDTO;
 import br.com.vieiradev.apiBiblioteca.dtos.LoanRequestDTO;
 import br.com.vieiradev.apiBiblioteca.dtos.LoanResponseDTO;
 import br.com.vieiradev.apiBiblioteca.services.LoanService;
