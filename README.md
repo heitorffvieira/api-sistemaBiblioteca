@@ -6,10 +6,12 @@ O projeto permite cadastrar livros, clientes e controlar empréstimos e devoluç
 ## Tecnologias utilizadas
 - Java 17
 - Spring Boot
+- Spring Web
 - Spring Data JPA
-- PostgreSQL
-- Maven
-- Lombok
+- Spring Validation
+- PostgreSQL (banco de dados em nuvem)
+- Maven (gerenciamento de dependências)
+- Lombok (redução de código boilerplate)
 
 ## Arquitetura do projeto
 
@@ -84,6 +86,20 @@ Regras:
 
 - Um empréstimo só pode ser finalizado uma vez
 - Ao devolver um livro, a quantidade disponível é atualizada automaticamente
+
+## Deploy e Infraestrutura
+- A API está em ambiente de produção utilizando a plataforma Railway.
+- Backend hospedado em nuvem com deploy automatizado via Git
+- Banco de dados PostgreSQL gerenciado pela plataforma
+- Uso de variáveis de ambiente para configuração segura (URL, usuário e senha do banco)
+- Configuração de ambiente de produção com Spring Profiles
+- Integração com frontend já publicada
+
+## Acesso ao Projeto
+A aplicação está disponível em produção:
+
+- Frontend: https://codelibrary-seven.vercel.app/
+- Backend (API): https://api-sistemabiblioteca-production.up.railway.app/
 
 ## Regras de Negócio Aplicadas:
 - Validação de quantidade total de livros no cadastro
