@@ -88,7 +88,7 @@ Regras:
 - Ao devolver um livro, a quantidade disponível é atualizada automaticamente
 
 ## Deploy e Infraestrutura
-- A API está em ambiente de produção utilizando a plataforma Railway.
+- A API está em ambiente de produção utilizando a plataforma Render.
 - Backend hospedado em nuvem com deploy automatizado via Git
 - Banco de dados PostgreSQL gerenciado pela plataforma
 - Uso de variáveis de ambiente para configuração segura (URL, usuário e senha do banco)
@@ -99,7 +99,7 @@ Regras:
 A aplicação está disponível em produção:
 
 - Frontend: https://codelibrary-seven.vercel.app/
-- Backend (API): https://api-sistemabiblioteca-production.up.railway.app/
+- Backend (API): https://api-sistemabiblioteca.onrender.com
 
 ## Regras de Negócio Aplicadas:
 - Validação de quantidade total de livros no cadastro
