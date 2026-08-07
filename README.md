@@ -88,9 +88,9 @@ Regras:
 - Ao devolver um livro, a quantidade disponível é atualizada automaticamente
 
 ## Deploy e Infraestrutura
-- A API está em ambiente de produção utilizando a plataforma Render.
+- A API está em ambiente de produção utilizando a plataforma Render
 - Backend hospedado em nuvem com deploy automatizado via Git
-- Banco de dados PostgreSQL gerenciado pela plataforma
+- Banco de dados PostgreSQL gerenciado pela plataforma Supabase
 - Uso de variáveis de ambiente para configuração segura (URL, usuário e senha do banco)
 - Configuração de ambiente de produção com Spring Profiles
 - Integração com frontend já publicada
