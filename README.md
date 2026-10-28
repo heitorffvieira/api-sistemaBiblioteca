@@ -3,6 +3,9 @@
 API REST desenvolvida para gerenciar um sistema de biblioteca.
 O projeto permite cadastrar livros, clientes e controlar empréstimos e devoluções, incluindo regras de negócio como disponibilidade de exemplares e finalização de empréstimos.
 
+## Anexos: 
+<img width="1916" height="913" alt="image" src="https://github.com/user-attachments/assets/53ef0393-e3ec-4940-a14b-6dcb2bae191a" />
+
 ## Tecnologias utilizadas
 - Java 17
 - Spring Boot
